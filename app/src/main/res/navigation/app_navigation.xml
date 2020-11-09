@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/app_navigation"
+            app:startDestination="@id/carListFragment">
+    <fragment
+        android:id="@+id/carListFragment"
+        android:name="com.example.android_internship.ui.fragment.carList.CarListFragment"
+        android:label="fragment_car_list"
+        tools:layout="@layout/fragment_car_list">
+        <action
+            android:id="@+id/action_carListFragment_to_carCreateDialog"
+            app:destination="@id/carCreateDialog"/>
+        <action android:id="@+id/action_carListFragment_to_carDetails" app:destination="@id/carDetails"/>
+    </fragment>
+    <fragment
+        android:id="@+id/carCreateDialog"
+        android:name="com.example.android_internship.ui.fragment.carCreate.CarCreateFragment"
+        android:label="CarCreateDialog"/>
+    <fragment android:id="@+id/carDetails"
+              android:name="com.example.android_internship.ui.fragment.carDetails.CarDetailsFragment"
+              android:label="fragment_car_details" tools:layout="@layout/fragment_car_details">
+        <argument
+            android:name="car"
+            app:argType="com.example.android_internship.car.CarParcelable"/>
+        <action
+            android:id="@+id/action_carDetails_to_carModifyFragment"
+            app:destination="@id/carModifyFragment"
+            app:popUpToInclusive="false"/>
+    </fragment>
+    <fragment
+        android:id="@+id/carModifyFragment"
+        android:name="com.example.android_internship.ui.fragment.carModify.CarModifyFragment"
+        android:label="fragment_car_modify"
+        tools:layout="@layout/fragment_car_modify">
+        <argument
+            android:name="car"
+            app:argType="com.example.android_internship.car.CarParcelable"/>
+        <action
+            android:id="@+id/action_carModifyFragment_to_carDetails"
+            app:destination="@id/carDetails"
+            app:popUpTo="@id/carDetails"
+            app:popUpToInclusive="true"/>
+    </fragment>
+</navigation>

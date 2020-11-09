@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MyAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">#212121</item>
+        <item name="android:colorSecondary">#212121</item>
+        <item name="colorPrimaryVariant">#212121</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#212121</item>
+        <item name="colorSecondaryVariant">#212121</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorError">#F44336</item>
+        <item name="colorOnError">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#212121</item>
+        <item name="colorOnBackground">#212121</item>
+        <item name="shapeAppearanceOverlay">@drawable/button_with_alpha</item>
+    </style>
+</resources>

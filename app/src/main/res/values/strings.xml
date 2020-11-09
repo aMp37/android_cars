@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">android_internship</string>
+
+    <string name="appbar_menu_remove">Remove</string>
+    <string name="appbar_menu_save">save</string>
+
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
+
+    <string name="error_unexpected">"An unknown error has occurred: %1$s please contact system administrator"</string>
+    <string name="error_car_name_forbidden_characters">field contains forbidden characters</string>
+    <string name="error_field_input_mandatory">This field is mandatory</string>
+
+    <string name="car_create_vin_field_hint">VIN</string>
+    <string name="car_create_name_field_hint">Car name</string>
+    <string name="car_create_engine_capacity_field_hint">Capacity</string>
+    <string name="car_create_description_field_hint">Description</string>
+    <string name="error_car_create_vin_invalid">Vin number is invalid</string>
+    <string name="error_car_create_vin_exists">Car with this Vin already exists</string>
+    <string name="error_car_create_capacity_greater_than_5"><![CDATA[Value is > 5.0]]></string>
+
+    <string name="car_create_title">Add new car</string>
+    <string name="car_details_title">Details</string>
+    <string name="car_details_dialog_remove_title">Are you sure you want to delete %1$s ?</string>
+
+    <string name="car_list_title">Car list</string>
+    <string name="error_car_list_unexpected_error_message">An unexpected error occurred</string>
+
+    <string name="car_modify_title">Edit car info</string>
+    <string name="car_modify_name_hint">Name</string>
+    <string name="car_modify_description_hint">description</string>
+</resources>
