@@ -4,6 +4,8 @@ import com.example.android_internship.car.Car
 import com.example.android_internship.error.database.DatabaseError
 import com.google.gson.GsonBuilder
 import io.reactivex.Single
+import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.adapters.ImmutableListAdapter
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -29,8 +31,14 @@ object CarService {
 
     private val api = retrofit.create(CarApi::class.java)
 
-    fun fetchCarList(): Single<MutableList<Car>> = api.fetchAllCars()
-        .map { it.body()?.entries ?: setOf() }
+    fun fetchCarList(): Single<List<Car>> = api.fetchAllCars()
+        .map { it.body()?.entries ?: persistentSetOf() }
+        .flattenAsObservable { it }
+        .map { Car.fromFirebaseEntity(it.key, it.value) }
+        .toList()
+
+    fun fetchCarListWithNameStartAt(startAt: String): Single<List<Car>> = api.fetCarsOfFieldStartAt("\"c_name\"", startAt)
+        .map { it.body()?.entries ?: persistentSetOf() }
         .flattenAsObservable { it }
         .map { Car.fromFirebaseEntity(it.key, it.value) }
         .toList()

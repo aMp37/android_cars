@@ -25,9 +25,9 @@ data class Car(
     companion object {
         fun fromFirebaseEntity(vin: String, car: CarFirebaseEntity) = Car(
             vin,
-            car.name,
-            car.engineCapacity,
-            car.description
+            car.c_name,
+            car.c_engineCapacity,
+            car.c_description
         )
 
         fun fromFormInput(vin: String?, car: CarFormInput) = Car(

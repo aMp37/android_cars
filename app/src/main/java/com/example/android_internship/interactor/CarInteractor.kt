@@ -7,6 +7,8 @@ import java.lang.IllegalArgumentException
 object CarInteractor {
     fun fetchCarList() = CarService.fetchCarList()
 
+    fun fetchCarListWithNameStartAt(startAt: String) = CarService.fetchCarListWithNameStartAt(startAt)
+
     fun saveNewCar(car: Car) = CarService.saveNewCar(car)
 
     fun updateCar(car: Car) = CarService.updateCar(car)
