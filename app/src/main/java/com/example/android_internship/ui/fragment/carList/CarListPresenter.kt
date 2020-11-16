@@ -47,7 +47,8 @@ class CarListPresenter(private val carListView: View, itemClickObservable: Obser
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { updateCarList(it) },
-                onError = { displayCarListLoadingError(it) }))
+                onError = {
+                    displayCarListLoadingError(it) }))
     }
 
     private fun fetchCarListWithNameStartAt(startAt: String){

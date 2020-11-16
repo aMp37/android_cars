@@ -1,58 +1,62 @@
 package com.example.android_internship.api.car
 
 import com.example.android_internship.car.Car
-import com.example.android_internship.error.database.DatabaseError
-import com.google.gson.GsonBuilder
+import com.example.android_internship.car.CarFirebaseEntity
+import com.example.android_internship.error.database.AlreadyExistsError
+import com.example.android_internship.util.completes
+import com.example.android_internship.util.toSingle
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
+import com.google.firebase.ktx.Firebase
 import io.reactivex.Single
-import kotlinx.collections.immutable.*
-import kotlinx.collections.immutable.adapters.ImmutableListAdapter
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.IllegalArgumentException
 
 object CarService {
-    private val gson = GsonBuilder()
-        .create()
+    private val carsDatabaseReference by lazy { Firebase.database.getReferenceFromUrl(DATABASE_URL).child(
+        CARS_REFERENCE_NAME) }
 
-    private val client = OkHttpClient().newBuilder()
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY })
-        .build()
+    fun fetchCarList(): Single<List<Car>> = carMapDataSnapshotSingleToCarListSingle(carsDatabaseReference.toSingle())
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://comarchmockrest.firebaseio.com/")
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .client(client)
-        .build()
-
-    private val api = retrofit.create(CarApi::class.java)
-
-    fun fetchCarList(): Single<List<Car>> = api.fetchAllCars()
-        .map { it.body()?.entries ?: persistentSetOf() }
-        .flattenAsObservable { it }
-        .map { Car.fromFirebaseEntity(it.key, it.value) }
-        .toList()
-
-    fun fetchCarListWithNameStartAt(startAt: String): Single<List<Car>> = api.fetCarsOfFieldStartAt("\"c_name\"", startAt)
-        .map { it.body()?.entries ?: persistentSetOf() }
-        .flattenAsObservable { it }
-        .map { Car.fromFirebaseEntity(it.key, it.value) }
-        .toList()
+    fun fetchCarListWithNameStartAt(startAt: String): Single<List<Car>> = carMapDataSnapshotSingleToCarListSingle(carsDatabaseReference
+        .orderByChild(CARS_REFERENCE_CAR_NAME_FIELD)
+        .startAt(startAt)
+        .toSingle())
 
     fun saveNewCar(car: Car) =
-        api.fetchCarOfVin(car.vin ?: throw IllegalArgumentException("vin property cannot be null")).toObservable()
-            .map { if (it.body() != null) throw DatabaseError("car of vin ${car.vin} already exists") }
-            .switchMap { api.saveCar(car.vin, car.toFirebaseEntity()).toObservable() }
-            .singleOrError()
-            .map { Car.fromFirebaseEntity(car.vin, it) }
+        fetchCarOfVin(car.vin ?: throw IllegalArgumentException("vin property cannot be null"))
+            .map {
+                if (CarFirebaseEntity() != it.toFirebaseEntity()){
+                    throw AlreadyExistsError("car of vin ${car.vin} already exists")
+                } }
+            .flatMap {
+                carsDatabaseReference.child(car.vin).setValue(car.toFirebaseEntity())
+                    .completes()
+                    .andThen(fetchCarOfVin(car.vin))
+            }
 
-    fun updateCar(car: Car) =
-        api.updateCar(car.vin ?: throw IllegalArgumentException("vin property cannot be null"), car.toFirebaseEntity())
-            .map { Car.fromFirebaseEntity(car.vin, it) }
+    fun updateCar(car: Car): Single<Car> =
+        carsDatabaseReference.child(car.vin?: throw IllegalArgumentException("vin property cannot be null"))
+            .setValue(car.toFirebaseEntity())
+            .completes()
+            .andThen(fetchCarOfVin(car.vin))
 
-    fun deleteCarOfVin(vin: String) = api.deleteCarOfVin(vin)
+    fun deleteCarOfVin(vin: String) = carsDatabaseReference.child(vin)
+        .removeValue()
+        .completes()
+
+    private fun carMapDataSnapshotSingleToCarListSingle(single: Single<DataSnapshot>): Single<List<Car>> =
+        single.map { it.getValue<Map<String, CarFirebaseEntity>>()!!.entries }
+            .flattenAsObservable { it }
+            .map { Car.fromFirebaseEntity(it.key, it.value) }
+            .toList()
+
+    private fun fetchCarOfVin(vin: String) = carsDatabaseReference.child(vin)
+        .toSingle()
+        .map {
+            Car.fromFirebaseEntity(vin,it.getValue<CarFirebaseEntity>()?: CarFirebaseEntity()) }
+
+    private const val DATABASE_URL = "https://comarchmockrest.firebaseio.com/"
+    private const val CARS_REFERENCE_NAME = "cars"
+    private const val CARS_REFERENCE_CAR_NAME_FIELD = "c_name"
 }

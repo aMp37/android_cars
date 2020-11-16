@@ -5,8 +5,10 @@ import com.example.android_internship.base.BaseView
 import com.example.android_internship.car.Car
 import com.example.android_internship.car.CarFormInputValidationHelper
 import com.example.android_internship.car.CarFormInput
+import com.example.android_internship.error.database.AlreadyExistsError
 import com.example.android_internship.interactor.CarInteractor
 import com.example.android_internship.ui.error.InputError
+import com.example.android_internship.ui.error.UnknownError
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -94,8 +96,12 @@ class CarCreatePresenter(private val carCreateView: View) : BasePresenter(carCre
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { carCreateView.performNavigation(CommonNavigationCommand.Back) },
-                onError = {
-                    carCreateView.setVinFieldError(CarCreateInputError.AlreadyExistsError)
+                onError = { error ->
+                    if(error is AlreadyExistsError){
+                        carCreateView.setVinFieldError(CarCreateInputError.AlreadyExistsError)
+                    }else{
+                        carCreateView.displayUnknownErrorMessage(UnknownError(error))
+                    }
                     subscribeToAddButtonClickObservable()
                 })
     }

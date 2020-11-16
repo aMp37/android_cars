@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'com.google.gms.google-services'  // Google Services plugin
+
+
 
 android {
     compileSdkVersion 30
@@ -60,8 +63,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    //kotlinx
-    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.3")
 
     //network
     def okHttpVersion = '4.2.2'
@@ -75,6 +76,10 @@ dependencies {
 
     //android
     def nav_version = "2.3.1"
+
+    //firebase
+    implementation platform('com.google.firebase:firebase-bom:26.1.0')
+    implementation 'com.google.firebase:firebase-database-ktx'
 
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
     implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
