@@ -17,7 +17,7 @@ import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
-import kotlinx.android.synthetic.main.fragment_car_create_fragment.*
+import kotlinx.android.synthetic.main.fragment_car_create.*
 
 class CarCreateFragment : BaseFragment<CarCreatePresenter>(), CarCreatePresenter.View {
     private fun createFormInputObservable(): Observable<CarFormInput> = Observable.combineLatest(
@@ -38,8 +38,8 @@ class CarCreateFragment : BaseFragment<CarCreatePresenter>(), CarCreatePresenter
     override fun createPresenter(): CarCreatePresenter =
         CarCreatePresenter(this).apply {
             setCarObservable(createFormInputObservable())
-            setCancelButtonClickObservable(createCarTopAppBar.navigationClicks())
-            setAddButtonClickObservable(createCarTopAppBar.itemClicks()
+            setCancelButtonClickObservable(createCarToolbar.navigationClicks())
+            setAddButtonClickObservable(createCarToolbar.itemClicks()
                 .filter { it.itemId == R.id.saveChangesOption }
                 .map { Unit })
         }
@@ -80,6 +80,6 @@ class CarCreateFragment : BaseFragment<CarCreatePresenter>(), CarCreatePresenter
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_car_create_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_car_create, container, false)
     }
 }

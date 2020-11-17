@@ -10,8 +10,14 @@
         tools:layout="@layout/fragment_car_list">
         <action
             android:id="@+id/action_carListFragment_to_carCreateDialog"
-            app:destination="@id/carCreateDialog"/>
-        <action android:id="@+id/action_carListFragment_to_carDetails" app:destination="@id/carDetails"/>
+            app:destination="@id/carCreateDialog"
+            app:enterAnim="@anim/enter_from_bottom"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@anim/pop_from_top"/>
+        <action android:id="@+id/action_carListFragment_to_carDetails" app:destination="@id/carDetails"
+                app:enterAnim="@anim/enter_right_to_left" app:exitAnim="@anim/exit_right_to_left"
+                app:popEnterAnim="@anim/enter_left_to_right" app:popExitAnim="@anim/exit_left_to_right"/>
     </fragment>
     <fragment
         android:id="@+id/carCreateDialog"
@@ -26,6 +32,10 @@
         <action
             android:id="@+id/action_carDetails_to_carModifyFragment"
             app:destination="@id/carModifyFragment"
+            app:enterAnim="@anim/enter_from_bottom"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@anim/pop_from_top"
             app:popUpToInclusive="false"/>
     </fragment>
     <fragment
@@ -39,7 +49,9 @@
         <action
             android:id="@+id/action_carModifyFragment_to_carDetails"
             app:destination="@id/carDetails"
-            app:popUpTo="@id/carDetails"
-            app:popUpToInclusive="true"/>
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@anim/pop_from_top"
+            app:popEnterAnim="@anim/enter_left_to_right"
+            app:popExitAnim="@anim/exit_left_to_right" app:popUpTo="@id/carDetails" app:popUpToInclusive="true"/>
     </fragment>
 </navigation>

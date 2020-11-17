@@ -21,7 +21,7 @@ import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
-import kotlinx.android.synthetic.main.fragment_car_create_fragment.*
+import kotlinx.android.synthetic.main.fragment_car_create.*
 import kotlinx.android.synthetic.main.fragment_car_modify.*
 import java.lang.IllegalArgumentException
 

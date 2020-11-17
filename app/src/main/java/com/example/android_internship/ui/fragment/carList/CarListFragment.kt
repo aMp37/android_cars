@@ -31,8 +31,7 @@ class CarListFragment : BaseFragment<CarListPresenter>(),
         return inflater.inflate(R.layout.fragment_car_list, container, false).also {
             it.carRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             it.carRecyclerView.adapter = carListRecyclerViewAdapter
-
-            it.carListSearch.setMenuItem(it.fooToolbar.menu.findItem(R.id.carListSearchItem))
+            it.carListSearch.setMenuItem(it.carListToolbar.menu.findItem(R.id.carListSearchItem))
         }
     }
 

@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/fooToolbar"
+                android:id="@+id/carListToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:menu="@menu/car_list_appbar_menu">
