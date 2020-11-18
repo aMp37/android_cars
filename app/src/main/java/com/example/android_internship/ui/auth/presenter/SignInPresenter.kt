@@ -3,7 +3,7 @@ package com.example.android_internship.ui.auth.presenter
 import com.example.android_internship.api.auth.AuthService
 import com.example.android_internship.base.BasePresenter
 import com.example.android_internship.base.BaseView
-import com.example.android_internship.ui.auth.fragment.SignInNavigationCommand
+import com.example.android_internship.ui.auth.fragment.AuthInNavigationCommand
 import com.example.android_internship.ui.error.UnknownError
 import com.example.android_internship.user.UserAuthCredentials
 import io.reactivex.Observable
@@ -42,7 +42,7 @@ class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
         addDisposable(AuthService.signInUser(userAuthCredentials)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { signInView.performNavigation(SignInNavigationCommand.ToCarList) },
+                onComplete = { signInView.performNavigation(AuthInNavigationCommand.ToCarList) },
                 onError = { signInView.displayUnknownErrorMessage(UnknownError(it)) }
             ))
     }
@@ -51,7 +51,7 @@ class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
         BehaviorSubject.create<UserAuthCredentials>().also { userAuthCredentialsObservable.subscribe(it) }.value
 
     private fun onSignUpButtonClick() {
-        signInView.performNavigation(SignInNavigationCommand.ToSignUp)
+        signInView.performNavigation(AuthInNavigationCommand.ToSignUp)
     }
 
     interface View : BaseView

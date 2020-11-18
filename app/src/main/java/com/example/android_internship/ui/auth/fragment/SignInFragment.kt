@@ -28,7 +28,8 @@ class SignInFragment : BaseFragment<SignInPresenter>(), SignInPresenter.View {
     override fun performNavigation(command: NavigationCommand) {
         when (command) {
             is CommonNavigationCommand.Back -> activity?.finish()
-            is SignInNavigationCommand.ToCarList -> findNavController().navigate(SignInFragmentDirections.actionSignInFragmentToCarListFragment())
+            is AuthInNavigationCommand.ToCarList -> findNavController().navigate(SignInFragmentDirections.actionSignInFragmentToCarListFragment())
+            is AuthInNavigationCommand.ToSignUp -> findNavController().navigate(SignInFragmentDirections.actionSignInFragmentToSignUpFragment())
         }
     }
 
