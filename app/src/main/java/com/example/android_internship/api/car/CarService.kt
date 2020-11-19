@@ -11,6 +11,7 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import io.reactivex.Single
 import java.lang.IllegalArgumentException
+import java.util.*
 
 object CarService {
     private val carsDatabaseReference by lazy { Firebase.database.getReferenceFromUrl(DATABASE_URL).child(
@@ -19,8 +20,9 @@ object CarService {
     fun fetchCarList(): Single<List<Car>> = carMapDataSnapshotSingleToCarListSingle(carsDatabaseReference.toSingle())
 
     fun fetchCarListWithNameStartAt(startAt: String): Single<List<Car>> = carMapDataSnapshotSingleToCarListSingle(carsDatabaseReference
-        .orderByChild(CARS_REFERENCE_CAR_NAME_FIELD)
-        .startAt(startAt)
+        .orderByChild(CARS_REFERENCE_CAR_NAME_SEARCH_FIELD)
+        .startAt(startAt.toUpperCase(Locale.getDefault()))
+        .endAt(startAt.toUpperCase(Locale.getDefault())+"\uf8ff")
         .toSingle())
 
     fun saveNewCar(car: Car) =
@@ -58,5 +60,5 @@ object CarService {
 
     private const val DATABASE_URL = "https://comarchmockrest.firebaseio.com/"
     private const val CARS_REFERENCE_NAME = "cars"
-    private const val CARS_REFERENCE_CAR_NAME_FIELD = "c_name"
+    private const val CARS_REFERENCE_CAR_NAME_SEARCH_FIELD = "c_name_upper"
 }
