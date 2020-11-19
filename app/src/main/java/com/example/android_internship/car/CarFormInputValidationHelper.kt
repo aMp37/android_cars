@@ -3,19 +3,23 @@ package com.example.android_internship.car
 import com.example.android_internship.ui.error.CommonInputError
 import com.example.android_internship.ui.error.InputError
 import com.example.android_internship.ui.fragment.carCreate.CarCreateInputError
+import com.example.android_internship.util.containsSpecialCharacter
 import java.lang.NumberFormatException
 
 
 object CarFormInputValidationHelper {
     fun validateCarVinInputValue(inputValue: String): InputError? {
-        if (false) {    //TODO validate vin pattern
+        if(inputValue.isNotEmpty() && inputValue.length < 17){
+            return CarCreateInputError.VinInvalid
+        }
+        if(inputValue.containsSpecialCharacter()){
             return CarCreateInputError.VinInvalid
         }
         return null
     }
 
     fun validateCarNameInputValue(inputValue: String): InputError? {
-        if (inputValue.contains("-?/\\!@#$%^&*(){}[]|=+_`~")) {
+        if (inputValue.containsSpecialCharacter()) {
             return CarCreateInputError.NameInvalid
         }
         return null
