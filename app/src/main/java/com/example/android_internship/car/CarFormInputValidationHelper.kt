@@ -19,7 +19,7 @@ object CarFormInputValidationHelper {
     }
 
     fun validateCarNameInputValue(inputValue: String): InputError? {
-        if (inputValue.containsSpecialCharacter()) {
+        if (inputValue.filter { !it.isWhitespace() }.containsSpecialCharacter()) {
             return CarCreateInputError.NameInvalid
         }
         return null
