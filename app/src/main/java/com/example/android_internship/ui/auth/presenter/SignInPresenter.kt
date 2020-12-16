@@ -3,9 +3,11 @@ package com.example.android_internship.ui.auth.presenter
 import com.example.android_internship.api.auth.AuthService
 import com.example.android_internship.base.BasePresenter
 import com.example.android_internship.base.BaseView
+import com.example.android_internship.error.ErrorMessage
+import com.example.android_internship.ui.auth.error.AuthSignInError
 import com.example.android_internship.ui.auth.fragment.AuthInNavigationCommand
-import com.example.android_internship.ui.error.UnknownError
 import com.example.android_internship.user.UserAuthCredentials
+import com.example.android_internship.util.AuthUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -17,6 +19,7 @@ class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
 
     fun setUserAuthCredentialsObservable(observable: Observable<UserAuthCredentials>) {
         this.userAuthCredentialsObservable = observable
+        setupValidation()
     }
 
     fun setSignInButtonObservable(observable: Observable<Unit>) {
@@ -43,7 +46,7 @@ class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { signInView.performNavigation(AuthInNavigationCommand.ToCarList) },
-                onError = { signInView.displayUnknownErrorMessage(UnknownError(it)) }
+                onError = { signInView.showError(AuthSignInError.WrongEmailOrPassword) }
             ))
     }
 
@@ -54,5 +57,20 @@ class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
         signInView.performNavigation(AuthInNavigationCommand.ToSignUp)
     }
 
-    interface View : BaseView
+    private fun setupValidation() {
+        addDisposable(userAuthCredentialsObservable.observeOn(AndroidSchedulers.mainThread())
+            .map { AuthUtils.EMAIL_ADDRESS_REGEX matches it.email && it.password.isNotEmpty() }
+            .subscribe {
+                if (it) {
+                    signInView.setLoginButtonEnabled(true)
+                } else {
+                    signInView.setLoginButtonEnabled(false)
+                }
+            })
+    }
+
+    interface View : BaseView {
+        fun setLoginButtonEnabled(enabled: Boolean)
+        fun showError(error: ErrorMessage?)
+    }
 }

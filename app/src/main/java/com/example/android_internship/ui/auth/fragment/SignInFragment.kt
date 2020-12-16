@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.android_internship.R
 import com.example.android_internship.base.BaseFragment
+import com.example.android_internship.error.ErrorMessage
+import com.example.android_internship.ui.auth.error.AuthSignInError
 import com.example.android_internship.ui.auth.presenter.SignInPresenter
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import com.example.android_internship.ui.navigation.NavigationCommand
@@ -23,6 +25,27 @@ class SignInFragment : BaseFragment<SignInPresenter>(), SignInPresenter.View {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_sign_in, container, false)
+    }
+
+    override fun setLoginButtonEnabled(enabled: Boolean) {
+        signInButton.isEnabled = enabled
+    }
+
+    override fun showError(error: ErrorMessage?) {
+        if (error != null) {
+            signInErrorText.visibility = View.VISIBLE
+            when (error) {
+                is AuthSignInError.WrongEmailOrPassword -> {
+                    signInErrorText.text = "Wrong email or password"
+                }
+            }
+        } else {
+            signInErrorText.run {
+                text = ""
+                visibility = View.GONE
+            }
+        }
+
     }
 
     override fun performNavigation(command: NavigationCommand) {
