@@ -6,8 +6,5 @@ data class UserSignUpFormInput(
     val repeatedPassword: String,
     val displayName: String
 ){
-    val passwordsAreSame: Boolean
-        get() = password == repeatedPassword
-
     fun toAuthCredentials() = UserAuthCredentials(email,password)
 }

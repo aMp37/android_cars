@@ -32,6 +32,44 @@ class SignUpFragment : BaseFragment<SignUpPresenter>(), SignUpPresenter.View {
         setBackButtonObservable(signUpToolbar.navigationClicks())
     }
 
+    override fun setSignUpButtonEnabled(enabled: Boolean) {
+        signUpSignUpButton.isEnabled = enabled
+    }
+
+    override fun isPasswordsAreNotSameErrorVisible(visible: Boolean) {
+        if (visible) {
+            signUpRetypePasswordTextInputLayout.error = "Passwords are not same"
+        } else {
+            signUpRetypePasswordTextInputLayout.error = null
+        }
+    }
+
+    override fun isPasswordErrorVisible(visible: Boolean) {
+        if (visible) {
+            signUpPasswordTextInputLayout.error =
+                "Password length must be greater than ${SignUpPresenter.PASSWORD_MINIMUM_LENGTH}"
+        } else {
+            signUpPasswordTextInputLayout.error = null
+        }
+    }
+
+    override fun isDisplayNameErrorVisible(visible: Boolean) {
+        if (visible) {
+            signUpDisplayNameTextInputLayout.error = "Display name can't contain special character"
+        } else {
+            signUpDisplayNameTextInputLayout.error = null
+        }
+    }
+
+    override fun isEmailAlreadyUsedErrorVisible(visible: Boolean) {
+        if (visible) {
+            signUpError.visibility = View.VISIBLE
+            signUpError.text = "Email already in use"
+        } else {
+            signUpError.visibility = View.GONE
+        }
+    }
+
     override fun performNavigation(command: NavigationCommand) {
         when(command){
             is CommonNavigationCommand.Back -> findNavController().popBackStack()

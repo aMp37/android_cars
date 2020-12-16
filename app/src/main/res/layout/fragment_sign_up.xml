@@ -95,17 +95,30 @@
                 app:layout_constraintTop_toBottomOf="@+id/signUpRetypePasswordTextInputLayout">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/signUpDisplayNameTextInput"
+                    android:maxLength="32"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/signUpError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="?attr/colorError"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/signUpDisplayNameTextInputLayout"
+                tools:text="error!"/>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/signUpSignUpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp" android:text="Sign Up"
+                android:layout_marginTop="16dp"
+                android:text="Sign Up"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/signUpDisplayNameTextInputLayout"/>
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/signUpError"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

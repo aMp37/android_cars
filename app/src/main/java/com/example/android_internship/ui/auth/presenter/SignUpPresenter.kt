@@ -7,27 +7,32 @@ import com.example.android_internship.ui.auth.fragment.AuthInNavigationCommand
 import com.example.android_internship.ui.error.UnknownError
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import com.example.android_internship.user.UserSignUpFormInput
+import com.example.android_internship.util.ValidationUtils
+import com.example.android_internship.util.containSpecialCharacter
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 
 class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
 
     private lateinit var signUpFormObservable: Observable<UserSignUpFormInput>
 
-    fun setSignUpFormInputObservable(observable: Observable<UserSignUpFormInput>){
+    fun setSignUpFormInputObservable(observable: Observable<UserSignUpFormInput>) {
         this.signUpFormObservable = observable
+        setUpValidation()
     }
 
-    fun setSignUpButtonObservable(observable: Observable<Unit>){
+    fun setSignUpButtonObservable(observable: Observable<Unit>) {
         addDisposable(
             observable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe{onSignUpClick()}
+                .subscribe { onSignUpClick() }
         )
     }
 
-    fun setBackButtonObservable(observable: Observable<Unit>){
+    fun setBackButtonObservable(observable: Observable<Unit>) {
         addDisposable(
             observable
                 .take(1)
@@ -36,23 +41,84 @@ class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
         )
     }
 
-
-    private fun onSignUpClick(){
+    private fun onSignUpClick() {
         signUpUser()
     }
 
-    private fun onBackClick(){
+    private fun onBackClick() {
         signUpView.performNavigation(CommonNavigationCommand.Back)
     }
 
     private fun signUpUser() {
-        addDisposable(AuthService.signUpUser(getLastEmittedValueFromObservable(signUpFormObservable)!!.toAuthCredentials())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {signUpView.performNavigation(AuthInNavigationCommand.ToCarList)},
-                onError = {signUpView.displayUnknownErrorMessage(UnknownError(it))}
-            ))
+        addDisposable(
+            AuthService.signUpUser(getLastEmittedValueFromObservable(signUpFormObservable)!!.toAuthCredentials())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = { signUpView.performNavigation(AuthInNavigationCommand.ToCarList) },
+                    onError = this::handleSignUpError
+                )
+        )
     }
 
-    interface View: BaseView
+    private fun setUpValidation() {
+        compositeDisposable += signUpFormObservable.observeOn(AndroidSchedulers.mainThread())
+            .map(this::isFormInputValid)
+            .subscribeBy { signUpView.setSignUpButtonEnabled(it) }
+
+        compositeDisposable += signUpFormObservable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::setUpPasswordsAreNotSameErrorDisplay)
+
+        compositeDisposable += signUpFormObservable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::setUpPasswordErrorDisplay)
+
+        compositeDisposable += signUpFormObservable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::setUpDisplayNameErrorDisplay)
+    }
+
+    private fun isFormInputValid(formInput: UserSignUpFormInput): Boolean =
+        ValidationUtils.EMAIL_ADDRESS_REGEX matches formInput.email &&
+                formInput.password.isNotEmpty() &&
+                isPasswordValid(formInput.password) &&
+                formInput.arePasswordsSame() &&
+                formInput.displayName.isNotEmpty() &&
+                isDisplayNameValid(formInput.displayName)
+
+    private fun setUpPasswordsAreNotSameErrorDisplay(userSignUpFormInput: UserSignUpFormInput) =
+        signUpView.isPasswordsAreNotSameErrorVisible(!userSignUpFormInput.arePasswordsSame())
+
+    private fun setUpPasswordErrorDisplay(userSignUpFormInput: UserSignUpFormInput) {
+        signUpView.isPasswordErrorVisible(!isPasswordValid(userSignUpFormInput.password))
+    }
+
+    private fun setUpDisplayNameErrorDisplay(userSignUpFormInput: UserSignUpFormInput) {
+        signUpView.isDisplayNameErrorVisible(!isDisplayNameValid(userSignUpFormInput.displayName))
+    }
+
+    private fun handleSignUpError(throwable: Throwable) {
+        if (throwable is FirebaseAuthUserCollisionException) {
+            signUpView.isEmailAlreadyUsedErrorVisible(true)
+        } else {
+            signUpView.displayUnknownErrorMessage(UnknownError(throwable))
+        }
+    }
+
+    private fun UserSignUpFormInput.arePasswordsSame() = password == repeatedPassword
+
+    private fun isPasswordValid(password: String) = password.isEmpty() || password.length > PASSWORD_MINIMUM_LENGTH
+
+    private fun isDisplayNameValid(displayName: String) =
+        displayName.isEmpty() || !displayName.containSpecialCharacter()
+
+    interface View : BaseView {
+        fun setSignUpButtonEnabled(enabled: Boolean)
+        fun isPasswordsAreNotSameErrorVisible(visible: Boolean)
+        fun isPasswordErrorVisible(visible: Boolean)
+        fun isDisplayNameErrorVisible(visible: Boolean)
+
+        fun isEmailAlreadyUsedErrorVisible(visible: Boolean)
+    }
+
+    companion object {
+        const val PASSWORD_MINIMUM_LENGTH = 8
+    }
 }

@@ -7,13 +7,13 @@ import com.example.android_internship.error.ErrorMessage
 import com.example.android_internship.ui.auth.error.AuthSignInError
 import com.example.android_internship.ui.auth.fragment.AuthInNavigationCommand
 import com.example.android_internship.user.UserAuthCredentials
-import com.example.android_internship.util.AuthUtils
+import com.example.android_internship.util.ValidationUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 
-class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
+class SignInPresenter(private val signInView: View) : BasePresenter(signInView) {
 
     private lateinit var userAuthCredentialsObservable: Observable<UserAuthCredentials>
 
@@ -59,7 +59,7 @@ class SignInPresenter(private val signInView: View): BasePresenter(signInView) {
 
     private fun setupValidation() {
         addDisposable(userAuthCredentialsObservable.observeOn(AndroidSchedulers.mainThread())
-            .map { AuthUtils.EMAIL_ADDRESS_REGEX matches it.email && it.password.isNotEmpty() }
+            .map { ValidationUtils.EMAIL_ADDRESS_REGEX matches it.email && it.password.isNotEmpty() }
             .subscribe {
                 if (it) {
                     signInView.setLoginButtonEnabled(true)
