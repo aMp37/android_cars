@@ -1,12 +1,13 @@
 package com.example.android_internship.util
 
+import com.example.android_internship.user.User
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.regex.Pattern
 
 fun MaterialSearchView.queryTextChanges() = Observable.create<String> { emitter ->
     this.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener{
@@ -55,4 +56,8 @@ fun<T> Task<T>.completes() = Completable.create{
         it.onError(throwable) }
 }
 
-fun String.containsSpecialCharacter() = "[^A-Za-z0-9]".toRegex().containsMatchIn(this)
+fun FirebaseUser.toUser() = User(
+    this.uid,
+    this.email ?: "",
+    this.displayName ?: ""
+)

@@ -7,6 +7,12 @@
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
 
+    <string name="sign_in">sign in</string>
+    <string name="sign_in_no_account">No account ?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="password_hint">password</string>
+    <string name="e_mail_hint">e-mail</string>
+
     <string name="error_unexpected">"An unknown error has occurred: %1$s please contact system administrator"</string>
     <string name="error_car_name_forbidden_characters">field contains forbidden characters</string>
     <string name="error_field_input_mandatory">This field is mandatory</string>
@@ -29,4 +35,6 @@
     <string name="car_modify_title">Edit car info</string>
     <string name="car_modify_name_hint">Name</string>
     <string name="car_modify_description_hint">description</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

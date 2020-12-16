@@ -3,7 +3,7 @@ package com.example.android_internship.car
 import com.example.android_internship.ui.error.CommonInputError
 import com.example.android_internship.ui.error.InputError
 import com.example.android_internship.ui.fragment.carCreate.CarCreateInputError
-import com.example.android_internship.util.containsSpecialCharacter
+import com.example.android_internship.util.containSpecialCharacter
 import java.lang.NumberFormatException
 
 
@@ -12,14 +12,14 @@ object CarFormInputValidationHelper {
         if(inputValue.isNotEmpty() && inputValue.length < 17){
             return CarCreateInputError.VinInvalid
         }
-        if(inputValue.containsSpecialCharacter()){
+        if(inputValue.containSpecialCharacter()){
             return CarCreateInputError.VinInvalid
         }
         return null
     }
 
     fun validateCarNameInputValue(inputValue: String): InputError? {
-        if (inputValue.filter { !it.isWhitespace() }.containsSpecialCharacter()) {
+        if (inputValue.filter { !it.isWhitespace() }.containSpecialCharacter()) {
             return CarCreateInputError.NameInvalid
         }
         return null
