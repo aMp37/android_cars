@@ -1,6 +1,8 @@
 package com.example.android_internship.util
 
+import com.example.android_internship.user.User
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import io.reactivex.Completable
@@ -59,6 +61,3 @@ fun FirebaseUser.toUser() = User(
     this.email ?: "",
     this.displayName ?: ""
 )
-
-
-fun String.containsSpecialCharacter() = "[^A-Za-z0-9]".toRegex().containsMatchIn(this)
