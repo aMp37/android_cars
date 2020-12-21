@@ -13,7 +13,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 
-class SignInPresenter(private val signInView: View) : BasePresenter(signInView) {
+class SignInPresenter(
+    private val signInView: View,
+    private val authService: AuthService) : BasePresenter(signInView){
 
     private lateinit var userAuthCredentialsObservable: Observable<UserAuthCredentials>
 
@@ -42,7 +44,7 @@ class SignInPresenter(private val signInView: View) : BasePresenter(signInView) 
     }
 
     private fun signInUser(userAuthCredentials: UserAuthCredentials) {
-        addDisposable(AuthService.signInUser(userAuthCredentials)
+        addDisposable(authService.signInUser(userAuthCredentials)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { signInView.performNavigation(AuthInNavigationCommand.ToCarList) },

@@ -15,7 +15,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 
-class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
+class SignUpPresenter(
+    private val signUpView: View,
+    private val authService: AuthService): BasePresenter(signUpView) {
 
     private lateinit var signUpFormObservable: Observable<UserSignUpFormInput>
 
@@ -51,7 +53,7 @@ class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
 
     private fun signUpUser() {
         addDisposable(
-            AuthService.signUpUser(getLastEmittedValueFromObservable(signUpFormObservable)!!.toAuthCredentials())
+            authService.signUpUser(getLastEmittedValueFromObservable(signUpFormObservable)!!.toAuthCredentials())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onComplete = { signUpView.performNavigation(AuthInNavigationCommand.ToCarList) },

@@ -17,8 +17,11 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
 import kotlinx.android.synthetic.main.fragment_sign_up.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
-class SignUpFragment : BaseFragment<SignUpPresenter>(), SignUpPresenter.View {
+class SignUpFragment : BaseFragment<SignUpPresenter>(), SignUpPresenter.View, KoinComponent {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -26,10 +29,13 @@ class SignUpFragment : BaseFragment<SignUpPresenter>(), SignUpPresenter.View {
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }
 
-    override fun createPresenter(): SignUpPresenter = SignUpPresenter(this).apply {
-        setSignUpFormInputObservable(createUserSignUpFormInputObservable())
-        setSignUpButtonObservable(signUpSignUpButton.clicks())
-        setBackButtonObservable(signUpToolbar.navigationClicks())
+    override fun createPresenter(): SignUpPresenter {
+        val presenter: SignUpPresenter by inject { parametersOf(this) }
+        return presenter.apply {
+            setSignUpFormInputObservable(createUserSignUpFormInputObservable())
+            setSignUpButtonObservable(signUpSignUpButton.clicks())
+            setBackButtonObservable(signUpToolbar.navigationClicks())
+        }
     }
 
     override fun setSignUpButtonEnabled(enabled: Boolean) {

@@ -18,8 +18,11 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import kotlinx.android.synthetic.main.fragment_sign_in.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
-class SignInFragment : BaseFragment<SignInPresenter>(), SignInPresenter.View {
+class SignInFragment : BaseFragment<SignInPresenter>(), SignInPresenter.View, KoinComponent {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,10 +59,13 @@ class SignInFragment : BaseFragment<SignInPresenter>(), SignInPresenter.View {
         }
     }
 
-    override fun createPresenter() = SignInPresenter(this).apply {
-        setUserAuthCredentialsObservable(createUserAuthCredentialsObservable())
-        setSignInButtonObservable(signInButton.clicks())
-        setSignUpButtonObservable(signInSignUpButton.clicks())
+    override fun createPresenter(): SignInPresenter {
+        val presenter: SignInPresenter by inject { parametersOf(this) }
+        return presenter.apply {
+            setUserAuthCredentialsObservable(createUserAuthCredentialsObservable())
+            setSignInButtonObservable(signInButton.clicks())
+            setSignUpButtonObservable(signInSignUpButton.clicks())
+        }
     }
 
     private fun createUserAuthCredentialsObservable(): Observable<UserAuthCredentials> =
