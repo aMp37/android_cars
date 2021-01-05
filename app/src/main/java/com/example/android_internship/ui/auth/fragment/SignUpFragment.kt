@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.android_internship.R
 import com.example.android_internship.base.BaseFragment
+import com.example.android_internship.ui.auth.SignUpContract
 import com.example.android_internship.ui.auth.presenter.SignUpPresenter
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import com.example.android_internship.ui.navigation.NavigationCommand
@@ -14,11 +15,20 @@ import com.example.android_internship.user.UserSignUpFormInput
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.widget.textChanges
+import dagger.Component
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
 import kotlinx.android.synthetic.main.fragment_sign_up.*
+import javax.inject.Inject
 
-class SignUpFragment : BaseFragment<SignUpPresenter>(), SignUpPresenter.View {
+@AndroidEntryPoint
+class SignUpFragment
+@Inject constructor() : BaseFragment<SignUpPresenter>(), SignUpContract.View {
+
+    @Inject
+    lateinit var signUpPresenter: SignUpPresenter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -26,7 +36,7 @@ class SignUpFragment : BaseFragment<SignUpPresenter>(), SignUpPresenter.View {
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }
 
-    override fun createPresenter(): SignUpPresenter = SignUpPresenter(this).apply {
+    override fun createPresenter(): SignUpPresenter = signUpPresenter.apply {
         setSignUpFormInputObservable(createUserSignUpFormInputObservable())
         setSignUpButtonObservable(signUpSignUpButton.clicks())
         setBackButtonObservable(signUpToolbar.navigationClicks())

@@ -1,36 +1,45 @@
 package com.example.android_internship.ui.fragment.carList
 
 import com.example.android_internship.base.BasePresenter
-import com.example.android_internship.base.BaseView
-import com.example.android_internship.interactor.CarInteractor
+import com.example.android_internship.car.CarUseCase
 import com.example.android_internship.car.Car
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class CarListPresenter(private val carListView: View, itemClickObservable: Observable<Car>) : BasePresenter(carListView) {
-    init {
-        addDisposable(itemClickObservable
+class CarListPresenter @Inject constructor(
+    private val carInteractor: CarUseCase
+) : BasePresenter(), CarListContract.Presenter {
+    private lateinit var carListView: CarListContract.View
+
+    override fun onCreate() {
+        fetchCarList()
+    }
+
+    override fun bindView(view: CarListContract.View) {
+        this.carListView = view
+        this.view = view
+    }
+
+    override fun setItemClickObservable(observable: Observable<Car>) {
+        addDisposable(observable
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 carListView.performNavigation(CarListNavigationCommand.ToCarDetailsView(it))
             })
     }
 
-    override fun onCreate() {
-        fetchCarList()
-    }
-
-    fun setCarCreateButtonClickObservable(observable: Observable<Unit>){
+    override fun setCarCreateButtonClickObservable(observable: Observable<Unit>){
         addDisposable(observable.take(1)
             .observeOn(AndroidSchedulers.mainThread())
             .singleOrError()
             .subscribeBy { onCarCreateButtonClick() })
     }
 
-    fun setCarSearchObservable(observable: Observable<String>){
+    override fun setCarSearchObservable(observable: Observable<String>){
         addDisposable(observable.debounce(500,TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -42,9 +51,10 @@ class CarListPresenter(private val carListView: View, itemClickObservable: Obser
 
     private fun fetchCarList() {
         carListView.updateErrorMessage(null)
-        addDisposable(CarInteractor.fetchCarList()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+        addDisposable(
+            carInteractor.fetchCarList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { updateCarList(it) },
                 onError = {
@@ -53,10 +63,11 @@ class CarListPresenter(private val carListView: View, itemClickObservable: Obser
 
     private fun fetchCarListWithNameStartAt(startAt: String){
         carListView.updateErrorMessage(null)
-        addDisposable(CarInteractor.fetchCarListWithNameStartAt(startAt)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
+        addDisposable(
+            carInteractor.fetchCarListWithNameStartAt(startAt)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
                 onSuccess = { updateCarList(it) },
                 onError = {displayCarListLoadingError(it) }
             ))
@@ -73,10 +84,5 @@ class CarListPresenter(private val carListView: View, itemClickObservable: Obser
     private fun displayCarListLoadingError(error: Throwable){
         carListView.updateErrorMessage(
             CarListError.CarListLoadingError(error))
-    }
-
-    interface View : BaseView {
-        fun updateCarList(carList: Collection<Car>)
-        fun updateErrorMessage(error: CarListError?)
     }
 }

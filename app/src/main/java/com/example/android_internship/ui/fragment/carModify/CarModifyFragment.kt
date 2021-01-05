@@ -19,14 +19,20 @@ import com.example.android_internship.ui.navigation.NavigationCommand
 import com.jakewharton.rxbinding3.appcompat.itemClicks
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.widget.textChanges
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
 import kotlinx.android.synthetic.main.fragment_car_create.*
 import kotlinx.android.synthetic.main.fragment_car_modify.*
 import java.lang.IllegalArgumentException
+import javax.inject.Inject
 
-class CarModifyFragment : BaseFragment<CarModifyPresenter>(), CarModifyPresenter.View {
+@AndroidEntryPoint
+class CarModifyFragment @Inject constructor() : BaseFragment<CarModifyPresenter>(), CarModifyContract.View {
     private val args: CarModifyFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var carModifyPresenter: CarModifyPresenter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +46,8 @@ class CarModifyFragment : BaseFragment<CarModifyPresenter>(), CarModifyPresenter
         carModifyToolbar.setNavigationOnClickListener { performNavigation(CommonNavigationCommand.Back) }
     }
 
-    override fun createPresenter(): CarModifyPresenter = CarModifyPresenter(this).apply {
+    override fun createPresenter(): CarModifyPresenter = carModifyPresenter.apply {
+        bindView(this@CarModifyFragment)
         setCarEntity(args.car.toCar())
         setCarInputObservable(createCarFormInputObservableFromInputs())
         setCancelButtonObservable(carModifyToolbar.navigationClicks())

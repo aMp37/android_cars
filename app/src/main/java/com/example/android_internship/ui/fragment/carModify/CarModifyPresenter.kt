@@ -1,45 +1,51 @@
 package com.example.android_internship.ui.fragment.carModify
 
 import com.example.android_internship.base.BasePresenter
-import com.example.android_internship.base.BaseView
 import com.example.android_internship.car.Car
 import com.example.android_internship.car.CarFormInput
-import com.example.android_internship.car.CarFormInputValidationHelper
-import com.example.android_internship.error.ErrorMessage
-import com.example.android_internship.interactor.CarInteractor
+import com.example.android_internship.util.CarFormInputValidationHelper
+import com.example.android_internship.car.CarUseCase
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import javax.inject.Inject
 
-class CarModifyPresenter(
-    private val carModifyView: View
-) : BasePresenter(carModifyView) {
+class CarModifyPresenter @Inject constructor(
+    private val carInteractor: CarUseCase
+) : BasePresenter(), CarModifyContract.Presenter {
 
     private lateinit var car: Car
 
     private lateinit var carInput: Observable<CarFormInput>
 
+    private lateinit var carModifyView: CarModifyContract.View
+
     private var saveButtonClickObservable: Observable<Unit>? = null
 
-    fun setCarEntity(car: Car) {
+    override fun bindView(view: CarModifyContract.View) {
+        this.carModifyView = view
+        this.view = view
+    }
+
+    override fun setCarEntity(car: Car) {
         this.car = car
         carModifyView.fillEditFieldsWithData(car)
     }
 
-    fun setCarInputObservable(observable: Observable<CarFormInput>) {
+    override fun setCarInputObservable(observable: Observable<CarFormInput>) {
         this.carInput = observable
         setUpFieldsValidation()
     }
 
-    fun setSaveButtonObservable(observable: Observable<Unit>) {
+    override fun setSaveButtonObservable(observable: Observable<Unit>) {
         this.saveButtonClickObservable = observable
         subscribeToAddButtonClickObservable()
     }
 
-    fun setCancelButtonObservable(observable: Observable<Unit>) {
+    override fun setCancelButtonObservable(observable: Observable<Unit>) {
         addDisposable(observable
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -69,7 +75,7 @@ class CarModifyPresenter(
     private fun saveChangesToDatabase(){
         val car = Car.fromFormInput(car.vin, getLastCarFormInputValue()!!)
         addDisposable(
-            CarInteractor.updateCar(car).subscribeOn(Schedulers.io())
+            carInteractor.updateCar(car).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { carModifyView.performNavigation(CarModifyNavigationCommand.BackWithResult(it)) },
@@ -97,10 +103,4 @@ class CarModifyPresenter(
 
     private fun getLastCarFormInputValue() =
         BehaviorSubject.create<CarFormInput>().also { carInput.subscribe(it) }.value
-
-
-    interface View : BaseView {
-        fun setNameFieldError(error: ErrorMessage?)
-        fun fillEditFieldsWithData(car: Car)
-    }
 }

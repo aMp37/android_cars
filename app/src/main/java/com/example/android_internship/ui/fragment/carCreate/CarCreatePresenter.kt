@@ -1,13 +1,11 @@
 package com.example.android_internship.ui.fragment.carCreate
 
 import com.example.android_internship.base.BasePresenter
-import com.example.android_internship.base.BaseView
 import com.example.android_internship.car.Car
-import com.example.android_internship.car.CarFormInputValidationHelper
+import com.example.android_internship.util.CarFormInputValidationHelper
 import com.example.android_internship.car.CarFormInput
 import com.example.android_internship.error.database.AlreadyExistsError
-import com.example.android_internship.interactor.CarInteractor
-import com.example.android_internship.ui.error.InputError
+import com.example.android_internship.car.CarUseCase
 import com.example.android_internship.ui.error.UnknownError
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import io.reactivex.Observable
@@ -15,24 +13,34 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import javax.inject.Inject
 
-class CarCreatePresenter(private val carCreateView: View) : BasePresenter(carCreateView) {
+class CarCreatePresenter @Inject constructor(
+    private val carInteractor: CarUseCase
+) : BasePresenter(), CarCreateContract.Presenter {
 
     private lateinit var carInput: Observable<CarFormInput>
 
+    private lateinit var carCreateView: CarCreateContract.View
+
     private var addButtonClickObservable: Observable<Unit>? = null
 
-    fun setCarObservable(carObservable: Observable<CarFormInput>) {
+    override fun bindView(view: CarCreateContract.View) {
+        this.carCreateView = view
+        this.view = view
+    }
+
+    override fun setCarObservable(carObservable: Observable<CarFormInput>) {
         this.carInput = carObservable
         setUpFieldsValidation()
     }
 
-    fun setAddButtonClickObservable(observable: Observable<Unit>) {
+    override fun setAddButtonClickObservable(observable: Observable<Unit>) {
         this.addButtonClickObservable = observable
         subscribeToAddButtonClickObservable()
     }
 
-    fun setCancelButtonClickObservable(observable: Observable<Unit>) {
+    override fun setCancelButtonClickObservable(observable: Observable<Unit>) {
         addDisposable(observable
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -91,7 +99,7 @@ class CarCreatePresenter(private val carCreateView: View) : BasePresenter(carCre
     }
 
     private fun saveCarToDatabase() = getLastEmittedCarFormObject()?.let {
-        CarInteractor.saveNewCar(Car.fromFormInput(it.vin, it))
+        carInteractor.saveNewCar(Car.fromFormInput(it.vin, it))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -108,10 +116,4 @@ class CarCreatePresenter(private val carCreateView: View) : BasePresenter(carCre
 
     private fun getLastEmittedCarFormObject() =
         BehaviorSubject.create<CarFormInput>().also { carInput.subscribe(it) }.value
-
-    interface View : BaseView {
-        fun setVinFieldError(error: InputError?)
-        fun setNameFieldError(error: InputError?)
-        fun setCapacityFieldError(error: InputError?)
-    }
 }

@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.android_internship.R
 import com.example.android_internship.error.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 
 abstract class BaseFragment<T: BasePresenter>: Fragment(), BaseView {
 
