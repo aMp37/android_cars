@@ -1,9 +1,13 @@
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+
+apply plugin: 'kotlin-kapt'
+apply plugin: 'dagger.hilt.android.plugin'
 
 
 
@@ -51,24 +55,6 @@ repositories {
 }
 
 dependencies {
-    //network
-    def okHttpVersion = '4.2.2'
-    def retrofitVersion = '2.6.2'
-    def okhttp3loggingInterceptorVersion = '4.9.0'
-
-    //rx
-    def rxandroidVersion = '2.1.1'
-    def rxjavaVersion = '2.2.13'
-    def rxkotlinVersion = '2.4.0'
-    def rxbindingVersion = '3.0.0'
-
-    //android
-    def navVersion = '2.3.1'
-    def firebaseBomVersion = '26.1.0'
-
-    //ui
-    def materialSearchViewVersion = '1.4.0'
-
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
@@ -110,4 +96,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:$okhttp3loggingInterceptorVersion")
 
     implementation "com.miguelcatalan:materialsearchview:$materialSearchViewVersion"
+
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
 }

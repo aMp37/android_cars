@@ -10,15 +10,22 @@ import androidx.navigation.fragment.navArgs
 import com.example.android_internship.R
 import com.example.android_internship.base.BaseFragment
 import com.example.android_internship.car.Car
+import com.example.android_internship.ui.fragment.carCreate.CarCreatePresenter
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
 import com.example.android_internship.ui.navigation.NavigationCommand
 import com.jakewharton.rxbinding3.appcompat.itemClicks
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.view.clicks
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_car_details.*
+import javax.inject.Inject
 
-class CarDetailsFragment : BaseFragment<CarDetailsPresenter>(), CarDetailsPresenter.View {
+@AndroidEntryPoint
+class CarDetailsFragment @Inject constructor() : BaseFragment<CarDetailsPresenter>(), CarDetailsContract.View {
+
+    @Inject
+    lateinit var carDetailsPresenter: CarDetailsPresenter
 
     private val args: CarDetailsFragmentArgs by navArgs()
 
@@ -30,7 +37,8 @@ class CarDetailsFragment : BaseFragment<CarDetailsPresenter>(), CarDetailsPresen
     }
 
     override fun createPresenter(): CarDetailsPresenter {
-        return CarDetailsPresenter(this).apply {
+        return carDetailsPresenter.apply {
+            bindView(this@CarDetailsFragment)
             setUpCarEntity(args.car.toCar())
             setEditButtonClickObservable(carDetailsEditButton.clicks())
             setBackButtonClickObservable(carDetailsToolbar.navigationClicks())

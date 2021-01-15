@@ -1,8 +1,8 @@
 package com.example.android_internship.ui.auth.presenter
 
-import com.example.android_internship.api.auth.AuthService
+import com.example.android_internship.auth.AuthUseCase
 import com.example.android_internship.base.BasePresenter
-import com.example.android_internship.base.BaseView
+import com.example.android_internship.ui.auth.SignUpContract
 import com.example.android_internship.ui.auth.fragment.AuthInNavigationCommand
 import com.example.android_internship.ui.error.UnknownError
 import com.example.android_internship.ui.navigation.CommonNavigationCommand
@@ -14,17 +14,26 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import javax.inject.Inject
 
-class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
+class SignUpPresenter
+@Inject constructor(private val authUseCase: AuthUseCase) : BasePresenter(), SignUpContract.Presenter {
 
     private lateinit var signUpFormObservable: Observable<UserSignUpFormInput>
 
-    fun setSignUpFormInputObservable(observable: Observable<UserSignUpFormInput>) {
+    private lateinit var signUpView: SignUpContract.View
+
+    override fun bindView(view: SignUpContract.View) {
+        this.signUpView = view
+        this.view = view
+    }
+
+    override fun setSignUpFormInputObservable(observable: Observable<UserSignUpFormInput>) {
         this.signUpFormObservable = observable
         setUpValidation()
     }
 
-    fun setSignUpButtonObservable(observable: Observable<Unit>) {
+    override fun setSignUpButtonObservable(observable: Observable<Unit>) {
         addDisposable(
             observable
                 .observeOn(AndroidSchedulers.mainThread())
@@ -32,7 +41,7 @@ class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
         )
     }
 
-    fun setBackButtonObservable(observable: Observable<Unit>) {
+    override fun setBackButtonObservable(observable: Observable<Unit>) {
         addDisposable(
             observable
                 .take(1)
@@ -50,14 +59,15 @@ class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
     }
 
     private fun signUpUser() {
-        addDisposable(
-            AuthService.signUpUser(getLastEmittedValueFromObservable(signUpFormObservable)!!.toAuthCredentials())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = { signUpView.performNavigation(AuthInNavigationCommand.ToCarList) },
-                    onError = this::handleSignUpError
-                )
-        )
+        authUseCase.signUpUser(getLastEmittedValueFromObservable(signUpFormObservable)!!.toAuthCredentials())?.let {
+            addDisposable(
+                it.observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = { signUpView.performNavigation(AuthInNavigationCommand.ToCarList) },
+                        onError = this::handleSignUpError
+                    )
+            )
+        }
     }
 
     private fun setUpValidation() {
@@ -108,15 +118,6 @@ class SignUpPresenter(private val signUpView: View): BasePresenter(signUpView) {
 
     private fun isDisplayNameValid(displayName: String) =
         displayName.isEmpty() || !displayName.containSpecialCharacter()
-
-    interface View : BaseView {
-        fun setSignUpButtonEnabled(enabled: Boolean)
-        fun isPasswordsAreNotSameErrorVisible(visible: Boolean)
-        fun isPasswordErrorVisible(visible: Boolean)
-        fun isDisplayNameErrorVisible(visible: Boolean)
-
-        fun isEmailAlreadyUsedErrorVisible(visible: Boolean)
-    }
 
     companion object {
         const val PASSWORD_MINIMUM_LENGTH = 8

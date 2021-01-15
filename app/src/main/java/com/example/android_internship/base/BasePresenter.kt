@@ -5,8 +5,14 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
 
-open class BasePresenter(protected val view: BaseView): Presenter {
+abstract class BasePresenter: Presenter {
+    protected lateinit var view: BaseView
+
     protected val compositeDisposable = CompositeDisposable()
+
+    protected fun bindView(view: BaseView) {
+        this.view = view
+    }
 
     protected fun addDisposable(disposable: Disposable){
         compositeDisposable.add(disposable)

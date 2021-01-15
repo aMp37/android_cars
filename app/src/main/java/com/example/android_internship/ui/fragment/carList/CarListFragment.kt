@@ -10,14 +10,22 @@ import com.example.android_internship.car.Car
 import com.example.android_internship.ui.navigation.NavigationCommand
 import com.example.android_internship.util.queryTextChanges
 import com.jakewharton.rxbinding3.view.clicks
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_car_list.*
 import kotlinx.android.synthetic.main.fragment_car_list.view.*
+import javax.inject.Inject
 
-class CarListFragment : BaseFragment<CarListPresenter>(),
-    CarListPresenter.View{
+@AndroidEntryPoint
+class CarListFragment @Inject constructor() : BaseFragment<CarListPresenter>(),
+    CarListContract.View {
     private lateinit var carListRecyclerViewAdapter: CarRecyclerViewAdapter
 
-    override fun createPresenter(): CarListPresenter = CarListPresenter(this, carListRecyclerViewAdapter.itemClicks()).apply {
+    @Inject
+    lateinit var carListPresenter: CarListPresenter
+
+    override fun createPresenter(): CarListPresenter = carListPresenter.apply {
+        bindView(this@CarListFragment)
+        setItemClickObservable(carListRecyclerViewAdapter.itemClicks())
         setCarCreateButtonClickObservable(addCarButton.clicks())
         setCarSearchObservable(carListSearch.queryTextChanges())
     }

@@ -1,9 +1,8 @@
-package com.example.android_internship.car
+package com.example.android_internship.util
 
 import com.example.android_internship.ui.error.CommonInputError
 import com.example.android_internship.ui.error.InputError
 import com.example.android_internship.ui.fragment.carCreate.CarCreateInputError
-import com.example.android_internship.util.containSpecialCharacter
 import java.lang.NumberFormatException
 
 

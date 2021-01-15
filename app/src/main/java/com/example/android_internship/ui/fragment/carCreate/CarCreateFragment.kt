@@ -15,11 +15,18 @@ import com.example.android_internship.ui.navigation.NavigationCommand
 import com.jakewharton.rxbinding3.appcompat.itemClicks
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.widget.textChanges
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
 import io.reactivex.functions.Function4
 import kotlinx.android.synthetic.main.fragment_car_create.*
+import javax.inject.Inject
 
-class CarCreateFragment : BaseFragment<CarCreatePresenter>(), CarCreatePresenter.View {
+@AndroidEntryPoint
+class CarCreateFragment @Inject constructor() : BaseFragment<CarCreatePresenter>(), CarCreateContract.View {
+
+    @Inject
+    lateinit var carCreatePresenter: CarCreatePresenter
+
     private fun createFormInputObservable(): Observable<CarFormInput> = Observable.combineLatest(
         vinTextInput.textChanges(),
         carNameTextInput.textChanges(),
@@ -36,7 +43,8 @@ class CarCreateFragment : BaseFragment<CarCreatePresenter>(), CarCreatePresenter
     )
 
     override fun createPresenter(): CarCreatePresenter =
-        CarCreatePresenter(this).apply {
+        carCreatePresenter.apply {
+            bindView(this@CarCreateFragment)
             setCarObservable(createFormInputObservable())
             setCancelButtonClickObservable(createCarToolbar.navigationClicks())
             setAddButtonClickObservable(createCarToolbar.itemClicks()
