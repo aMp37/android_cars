@@ -8,4 +8,5 @@ interface AuthService {
     fun signUpUser(userAuthDto: UserAuthCredentials): Completable?
     fun signInUser(userAuthDto: UserAuthCredentials): Completable
     fun updateCurrentUser(user: User): Completable
+    fun getCurrentUser(): User?
 }

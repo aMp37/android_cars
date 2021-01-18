@@ -29,6 +29,7 @@ class AuthServiceImpl @Inject constructor() : AuthService {
         Completable.error(Error("Cannot update unauthenticated user"))
     }
 
-    val currentUser: User
-        get() = auth.currentUser?.toUser() ?: throw Error("cannot get unauthenticated user")
+    override fun getCurrentUser(): User? {
+        return auth.currentUser?.toUser()
+    }
 }

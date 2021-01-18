@@ -22,6 +22,10 @@ class SignInPresenter
     override fun bindView(view: SignInContract.View) {
         this.signInView = view
         this.view = view
+
+        if(authUseCase.isUserSessionActive()){
+            view.performNavigation(AuthInNavigationCommand.ToCarList)
+        }
     }
 
     override fun setUserAuthCredentialsObservable(observable: Observable<UserAuthCredentials>) {
