@@ -19,4 +19,8 @@ class AuthUseCaseImpl @Inject constructor(
     override fun updateCurrentUser(user: User): Completable {
         return updateCurrentUser(user)
     }
+
+    override fun isUserSessionActive(): Boolean {
+        return authService.getCurrentUser() != null
+    }
 }

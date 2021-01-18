@@ -8,4 +8,5 @@ interface AuthUseCase {
     fun signUpUser(userAuthDto: UserAuthCredentials): Completable?
     fun signInUser(userAuthDto: UserAuthCredentials): Completable
     fun updateCurrentUser(user: User): Completable
+    fun isUserSessionActive(): Boolean
 }
